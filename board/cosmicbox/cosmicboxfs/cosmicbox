@@ -1,0 +1,196 @@
+#!/bin/sh
+#title       : cosmicbox
+#description : starts cosmicbox system
+#author      : rid
+#date        : 16/03/2015
+#version     : 0.0
+#usage       : cosmicbox {start|stop|restart}
+#--------------------------------------------------------------------------------
+
+#
+# Starts cosmibox
+#
+
+die () {
+    echo "*** FATAL: $1"
+    exit 1
+}
+
+COSMICBOX_HOME=/cosmicbox
+COSMICBOX_HOSTNAME=$(cat /etc/hostname)
+
+COSMICBOX_CONF=$COSMICBOX_HOME/cosmicbox.conf
+COSMICBOX_ETC_DIR=$COSMICBOX_HOME/etc
+COSMICBOX_TEMPLATES_DIR=$COSMICBOX_HOME/etc.templates
+
+# load config file
+[ -f $COSMICBOX_CONF ] || die "Cannot find config file"
+. $COSMICBOX_CONF
+
+HOSTS_CONF=$COSMICBOX_ETC_DIR/hosts
+
+DNSMASQ=/usr/sbin/dnsmasq
+DNSMASQ_CONF=$COSMICBOX_ETC_DIR/dnsmasq.conf
+DNSMASQ_PID=/var/run/dnsmasq.pid
+
+DROOPY=$COSMICBOX_HOME/bin/droopy
+DROOPY_CHUID=nobody:nogroup
+DROOPY_DIR=/media/usb0/Upload
+DROOPY_HOST=$COSMICBOX_HOST
+DROOPY_PID=/var/run/droopy.pid
+DROOPY_PORT=8080
+DROOPY_TXT=
+
+HOSTAPD=/usr/sbin/hostapd
+HOSTAPD_CONF=$COSMICBOX_ETC_DIR/hostapd.conf
+HOSTAPD_PID=/var/run/hostapd.pid
+
+LIGHTTPD=/usr/sbin/lighttpd
+LIGHTTPD_CONF=$COSMICBOX_ETC_DIR/lighttpd/lighttpd.conf
+LIGHTTPD_PID=/var/run/lighttpd.pid
+LIGHTTPD_RUNDIR=/var/lib/lighttpd
+LIGHTTPD_SOCKETS=$LIGHTTPD_RUNDIR/sockets
+
+TESTIFACE="cat /proc/net/dev | grep wlan0 > /dev/null"
+
+prepare_config() {
+
+    # clear config directory
+    rm -rf $COSMICBOX_ETC_DIR
+    cp -rf $COSMICBOX_TEMPLATES_DIR $COSMICBOX_ETC_DIR
+
+    # variables names (see cosmicbox.conf)
+    # NOTE(rid): do not forget COSMICBOX_HOME, COSMICBOX_ETC_DIR and COSMICBOX_HOSTNAME vars
+    CONFIG_VARS="COSMICBOX_HOME \
+                 COSMICBOX_HOSTNAME \
+                 COSMICBOX_ETC_DIR \
+                 $(grep '^[[:blank:]]*[^[:blank:]=]\+[[:blank:]]*=' $COSMICBOX_CONF | cut -d= -f1 | sed 's/[[:blank:]]//g')"
+
+    # complete every config file with variable from cosmicbox config file
+    for f in $(find $COSMICBOX_ETC_DIR -type f); do
+
+        for v in $CONFIG_VARS; do
+            value=$(eval echo \$$v)
+            # echo "$v ---> $value"
+            sed -i 's|%'$v'%|'"$value"'|g' $f
+        done
+
+    done
+
+    # modify redirect file with new host
+    sed -i 's%http://\([^/]\+\)/content%http://'$COSMICBOX_HOST'/content%' $COSMICBOX_HOME/www/redirect.html
+}
+
+config() {
+
+    # chown www directory
+    chown -R nobody:nogroup $COSMICBOX_HOME/www
+
+    # assure that lighttpd working dirs exist
+    [ ! -d $LIGHTTPD_RUNDIR ] && mkdir $LIGHTTPD_RUNDIR
+    [ ! -d $LIGHTTPD_SOCKETS ] && mkdir $LIGHTTPD_SOCKETS
+    chown nobody:nogroup $LIGHTTPD_RUNDIR
+    chown nobody:nogroup $LIGHTTPD_SOCKETS
+
+}
+
+start() {
+
+    prepare_config
+    config
+
+    # wait for wlan0
+    eval $TESTIFACE
+    while [ 0 -ne $? ]; do
+        sleep 1
+        eval $TESTIFACE
+    done
+
+    # wait for usb key
+    while [ ! -h /sys/block/sda ]; do
+        sleep 1
+    done
+
+    fsck -a /dev/sda1
+    mount /dev/sda1
+
+
+    # start hostapd as daemon
+    echo -n "Starting hostapd: "
+    start-stop-daemon -S -b -q -m -p $HOSTAPD_PID --exec $HOSTAPD -- $HOSTAPD_CONF
+    echo "OK"
+
+    # mount wlan0
+    /sbin/ifconfig wlan0 $COSMICBOX_ADDR netmask $COSMICBOX_MASK up
+
+    # start dnsmasq as daemon
+    echo -n "Starting dnsmasq: "
+    start-stop-daemon -S -q --exec $DNSMASQ -- -C $DNSMASQ_CONF
+    echo "OK"
+
+    # start droopy (http server for upload only) as daemon
+    echo -n "Starting droopy: "
+    start-stop-daemon -S -b -c $DROOPY_CHUID -m -p $DROOPY_PID --exec $DROOPY -- -H $DROOPY_HOST -d $DROOPY_DIR -m "$DROOPY_TXT" $DROOPY_PORT
+    echo "OK"
+
+    # start lighttpd as daemon
+    echo -n "Starting lighttpd: "
+    start-stop-daemon -S -q -p $LIGHTTPD_PID --exec $LIGHTTPD -- -f $LIGHTTPD_CONF
+    echo "OK"
+
+}
+
+stop() {
+
+    # stop lighttpd
+    echo -n "Stopping lighttpd: "
+    start-stop-daemon -K -q -p $LIGHTTPD_PID
+    rm -f $LIGHTTPD_PID
+    echo "OK"
+
+    # stop droopy
+    echo -n "Stopping droopy: "
+    start-stop-daemon -K -q -p $DROOPY_PID
+    rm -f $DROOPY_PID
+    echo "OK"
+
+    # stop dnsmasq
+    echo -n "Stopping dnsmasq: "
+    start-stop-daemon -K -q -p $DNSMASQ_PID
+    rm -f $DNSMASQ_PID
+    echo "OK"
+
+    # umount wifi interface
+    /sbin/ifconfig wlan0 down
+
+    # stop hostapd
+    echo -n "Stopping hostapd: "
+    start-stop-daemon -K -q -p $HOSTAPD_PID
+    rm -f $HOSTAPD_PID
+    echo "OK"
+
+    umount /dev/sda1
+}
+
+restart() {
+    stop
+    start
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
+

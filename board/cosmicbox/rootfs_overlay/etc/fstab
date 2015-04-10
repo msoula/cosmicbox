@@ -1,0 +1,14 @@
+# <file system>	<mount pt>	<type>	<options>	<dump>	<pass>
+/dev/root	/			vfat	rw,noauto				0	1
+proc		/proc		proc	defaults				0	0
+devpts		/dev/pts	devpts	defaults,gid=5,mode=620	0	0
+tmpfs		/dev/shm	tmpfs	mode=0777				0	0
+tmpfs		/tmp		tmpfs	mode=1777				0	0
+tmpfs		/run		tmpfs	mode=0755,nosuid,nodev	0	0
+sysfs		/sys		sysfs	defaults				0	0
+
+# cosmicbox partition
+/dev/mmcblk0p2	/cosmicbox	ext2	defaults			0	2
+
+# cosmicbox stick (nobody:nogroup)
+/dev/sda1		/media/usb0	vfat	defaults,noauto,gid=99,uid=99	0	2
