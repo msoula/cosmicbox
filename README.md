@@ -23,7 +23,7 @@ Plus d'informations: http://www.librarybox.us
 Le projet CosmicBox est né du besoin de disposer d'une version fonctionnelle
 de LibraryBox sur Raspberry-Pi. Ce projet est né à l'initiative de
 l'association Les Chats Cosmiques.
-Plus d'informations: http://cosmicbox.leschatscosmisques.net
+Plus d'informations: http://cosmicbox.leschatscosmiques.net
 
 ## À QUOI ÇA SERT ?
 
