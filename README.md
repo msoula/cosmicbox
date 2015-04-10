@@ -2,7 +2,7 @@
 
 * v0.1 (Mathieu Soula - msoula@gmx.com)
 * based on LibraryBox v2.0 (Jason Griffey - griffey@gmail.com)
-* based on PirateBox (David Darts - )
+* based on PirateBox (David Darts - daviddarts@gmail.com)
 
 ## QU'EST-CE QUE C'EST ?
 
