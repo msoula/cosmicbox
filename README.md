@@ -1,13 +1,10 @@
-###############################################################################
-#
-# CosmicBox v0.1 (Mathieu Soula - msoula@gmx.com)
-# based on LibraryBox v2.0 (Jason Griffey - griffey@gmail.com)
-# based on PirateBox (David Darts - )
-#
-###############################################################################
+# CosmicBox
 
-QU'EST-CE QUE C'EST ?
-=====================
+* v0.1 (Mathieu Soula - msoula@gmx.com)
+* based on LibraryBox v2.0 (Jason Griffey - griffey@gmail.com)
+* based on PirateBox (David Darts - )
+
+## QU'EST-CE QUE C'EST ?
 
 Une PirateBox est un dispositif électronique souvent composé d'un routeur
 et d'un dispositif de stockage d'information, créant un réseau sans fil qui
@@ -28,8 +25,7 @@ de LibraryBox sur Raspberry-Pi. Ce projet est né à l'initiative de
 l'association Les Chats Cosmiques.
 Plus d'informations: http://cosmicbox.leschatscosmisques.net
 
-À QUOI ÇA SERT ?
-================
+## À QUOI ÇA SERT ?
 
 Pour faire vite, une CosmicBox est une LibraryBox pour Raspberry-Pi.
 
@@ -42,8 +38,7 @@ la CosmicBox propose les mêmes fonctionnalités qu'une LibraryBox:
  - chat entre usagers;
  - relevé de statistiques d'utilisation.
 
-ARCHITECTURE DE LA COSMICBOX
-============================
+## ARCHITECTURE DE LA COSMICBOX
 
 Une CosmicBox est architecturée autour de deux partitions générées par
 buildroot.
@@ -81,8 +76,7 @@ dans le fichier /cosmicbox/cosmicbox.conf et copiés dans le répertoire
 /cosmicbox/etc. Si tous les éléments nécessaires sont réunis (clé wifi,
 support de stockage), la LibraryBox est alors lancée.
 
-CONFIGURATION DE LA COSMICBOX
-=============================
+## CONFIGURATION DE LA COSMICBOX
 
 Par défault, le projet CosmicBox est configuré pour ne reconnaître que les
 antennes Wifi USB WiPi. Il est toutefois possible de configurer buildroot
@@ -107,8 +101,7 @@ sélectionner le firmware requis pour votre driver.
 Pour modifier la configuration de base de la LibraryBox, éditer le fichier
 board/cosmicbox/cosmicboxfs/cosmicbox.conf.
 
-COMPILATION DE LA COSMICBOX
-===========================
+## COMPILATION DE LA COSMICBOX
 
 Dans le répertoire racine du projet, saisir la commande:
 
@@ -126,8 +119,7 @@ Après la compilation, vous obtenez cette arborescence:
     |   `-- start.elf
     `-- zImage
 
-PRÉPARATION DE LA CARTE SD
-==========================
+## PRÉPARATION DE LA CARTE SD
 
 Pour plus d'informations, visiter
 http://elinux.org/RPi_Advanced_Setup#Advanced_SD_card_setup
@@ -147,8 +139,7 @@ Pour monter les partitions (modifier 'sdX' pour correspondre à votre carte SD):
     sudo mount /dev/sdX1 /mnt/mountpointboot
     sudo mount /dev/sdX2 /mnt/mountpointlibrarybox
 
-INSTALLATION DU SYSTÈME SUR LA CARTE SD
-=======================================
+## INSTALLATION DU SYSTÈME SUR LA CARTE SD
 
 A la racine de la première partition, le RaspberryPi s'attend à trouver les
 fichiers suivants:
