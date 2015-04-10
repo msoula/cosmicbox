@@ -1,22 +1,23 @@
 
+BUILDROOT_DIR := buildroot-2015.02
 TOP := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 all: configure build
 
 # download buildroot and configure with cosmicbox config
 configure:
-	cd buildroot && $(MAKE) BR2_EXTERNAL=$(TOP) cosmicbox_defconfig
+	cd $(BUILDROOT_DIR) && $(MAKE) BR2_EXTERNAL=$(TOP) cosmicbox_defconfig
 
 # start buildroot build process
 build: configure
-	cd buildroot && $(MAKE)
+	cd $(BUILDROOT_DIR) && $(MAKE)
 
 menuconfig: configure
-	cd buildroot && $(MAKE) menuconfig
+	cd $(BUILDROOT_DIR) && $(MAKE) menuconfig
 
 linux-menuconfig: configure
-	cd buildroot && $(MAKE) linux-menuconfig
+	cd $(BUILDROOT_DIR) && $(MAKE) linux-menuconfig
 
 clean:
-	cd buildroot && $(MAKE) clean
+	cd $(BUILDROOT_DIR) && $(MAKE) clean
 
