@@ -1,0 +1,3 @@
+[submodule "buildroot-2015.02"]
+	path = buildroot-2015.02
+	url = http://git.buildroot.net/git/buildroot.git
