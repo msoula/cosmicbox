@@ -13,14 +13,16 @@ following command to clone this repo:
 
 ## WHAT IS IT?
 
-A PirateBox is a portable electronic device, often consisting in a combination of a Wi-Fi router
-and a device for storing information. It creates a wireless network that allows
-users who are connected to share files anonymously and locally. Conceived by David Darts, the PirateBox
-is designed to freely exchange data in the public domain or under a free license.
+A PirateBox is a portable electronic device, often consisting in a combination
+of a Wi-Fi router and a device for storing information. It creates a wireless
+network that allows users who are connected to share files anonymously and
+locally. Conceived by David Darts, the PirateBox is designed to freely exchange
+data in the public domain or under a free license.
 More information : http://piratebox.cc/start
 
-Built by Jason Griffey, LibraryBox is a fork of PirateBox for TP-Link MR 3020. LibraryBox is a digital
-distribution tool for education, libraries, healthcare, and emergency response.
+Built by Jason Griffey, LibraryBox is a fork of PirateBox for TP-Link MR 3020.
+LibraryBox is a digital distribution tool for education, libraries, healthcare,
+and emergency response.
 More information: http://www.librarybox.us
 
 The CosmicBox project aims to provide a fully functionnal LibraryBox for
@@ -39,7 +41,6 @@ as a standard LibraryBox:
  - file sharing;
  - chat;
  - usage statistics.
-But it also allows users to add new features designed by Mathieu Soula for Les Chats Cosmiques and their partners.
 
 ## ARCHITECTURE OF THE COSMICBOX
 
@@ -80,7 +81,7 @@ launches.
 ## CONFIGURATION OF THE COSMICBOX
 
 By default, the CosmicBox project is configured to only recognize WiFi
-USB antennaes Wi-Pi. However, it is possible to configure buildroot to
+USB antennae Wi-Pi. However, it is possible to configure buildroot to
 add new antennae.
 
 To do so, go into project root directory, and enter:
@@ -163,7 +164,7 @@ Umount all the partitions:
 
 And eject your SD card.
 
-## INSTALL THE COSMICBOX TO THE STORAGE DEVICE
+## INSTALL THE LIBRARYBOX TO THE STORAGE DEVICE
 
 You have to create one partition in fat32 on the storage device.
 
