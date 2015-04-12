@@ -4,6 +4,13 @@
 * based on LibraryBox v2.0 (Jason Griffey - griffey@gmail.com)
 * based on PirateBox (David Darts - daviddarts@gmail.com)
 
+## INSTALLATION À PARTIR DE GIT
+
+Le projet CosmicBox est associé au projet buildroot. Il est nécessaire de
+saisir la commande suivante pour clone ce repo:
+
+    git clone --recursive https://github.com/msoula/cosmicbox.git
+
 ## QU'EST-CE QUE C'EST ?
 
 Une PirateBox est un dispositif électronique souvent composé d'un routeur

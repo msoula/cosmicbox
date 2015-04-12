@@ -4,6 +4,13 @@
 * based on LibraryBox v2.0 (Jason Griffey - griffey@gmail.com)
 * based on PirateBox (David Darts - daviddarts@gmail.com)
 
+## INSTALLING FROM GIT
+
+The CosmicBox project has a buildroot submodule. You should enter the
+following command to clone this repo:
+
+    git clone --recursive https://github.com/msoula/cosmicbox.git
+
 ## WHAT IS IT?
 
 A PirateBox is a portable electronic device, often consisting of a Wi-Fi router
