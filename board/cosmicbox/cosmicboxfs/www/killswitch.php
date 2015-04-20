@@ -1,3 +1,3 @@
 <?php
-exec('/sbin/poweroff');
+exec('sudo /sbin/poweroff');
 ?>
