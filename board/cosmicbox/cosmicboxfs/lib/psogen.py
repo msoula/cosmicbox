@@ -35,8 +35,8 @@ except KeyError:
 #               content    -   String  containing preformatted data
 #--------------
 def generate_html(content):
-    htmlstring =   "<html><head><meta http-equiv='cache-control' content='no-cache'><meta name='GENERATOR' content='PyShoutOut'><title>Shout-Out Data</title><style type='text/css'>"
-    htmlstring +=  "<style>" + style  + "</style></head><body>"
+    htmlstring =   "<html><head><meta http-equiv='cache-control' content='no-cache'><meta name='GENERATOR' content='PyShoutOut'><title>Shout-Out Data</title>"
+    htmlstring +=  "<style type='text/css'>" + style  + "</style></head><body>"
     htmlstring +=  content
     htmlstring +=  "</body></html>"
     return htmlstring
