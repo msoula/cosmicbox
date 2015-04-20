@@ -83,6 +83,11 @@ prepare_config() {
 
 config() {
 
+    # initialize chat
+    > $SHOUTBOX_CHATFILE
+    export SHOUTBOX_CHATFILE SHOUTBOX_GEN_HTMLFILE
+    $COSMICBOX_HOME/lib/psogen.py input "$COSMICBOX_CHAT_USER" "$COSMICBOX_CHAT_MSG" "def"
+
     # chown www directory
     chown -R nobody:nogroup $COSMICBOX_HOME/www
 
@@ -91,7 +96,6 @@ config() {
     [ ! -d $LIGHTTPD_SOCKETS ] && mkdir $LIGHTTPD_SOCKETS
     chown nobody:nogroup $LIGHTTPD_RUNDIR
     chown nobody:nogroup $LIGHTTPD_SOCKETS
-
 }
 
 start() {

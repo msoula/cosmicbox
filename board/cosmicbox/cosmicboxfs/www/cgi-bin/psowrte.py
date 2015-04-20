@@ -21,7 +21,6 @@ else:
 datapass = re.sub("<", "&lt;", rawdata)
 data = re.sub(">", "&gt;", datapass)
 color = values["color"].value
-curdate = datetime.datetime.now()
 
 process_form(name, rawdata, color)
 

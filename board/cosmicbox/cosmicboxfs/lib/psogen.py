@@ -4,49 +4,49 @@
 #   enables further modifications for the ShoutBox
 #   Run without to generate htmlfile
 #   Run the following to enter a new line from command line
-#     psogen.py input Anonymous default "Text" 
+#     psogen.py input Anonymous default "Text"
 
-import os, datetime, re 
+import os, re
 
 import messages, broadcast
 
 datafilename = os.environ["SHOUTBOX_CHATFILE"]
 htmlfilename = os.environ["SHOUTBOX_GEN_HTMLFILE"]
 
+style=("name { font-weight: bold; font-family:Tahoma } "
+       "data { font-family: Tahoma } "
+       "data.def { color: #000000 } "
+       "data.blue { color: #0000FF } "
+       "data.green { color: #008000 } "
+       "data.orange { color: #FF8040 } "
+       "data.red { color: #FF0000 }")
+
 try:
      raw_dest =  os.environ["SHOUTBOX_BROADCAST_DESTINATIONS"]
-     finished_dest = re.sub ( '#' , '"' , raw_dest ) 
-     broadcast_destination = eval ( finished_dest ) 
+     finished_dest = re.sub ( '#' , '"' , raw_dest )
+     broadcast_destination = eval ( finished_dest )
 except KeyError:
-     broadcast_destination = False 
+     broadcast_destination = False
 
 
 #--------------
-#  Generates Shoutbox-HTML-Frame  ... 
+#  Generates Shoutbox-HTML-Frame  ...
 #           Imports:
 #               content    -   String  containing preformatted data
 #--------------
 def generate_html(content):
-    css = open("style.css", 'r')
-    stl =  css.read()
-    css.close()
-
-    htmlstring =   "<html><head><meta http-equiv='cache-control' content='no-cache'><meta name='GENERATOR' content='PyShoutOut'><title>Shout-Out Data</title><style type='text/css'>" 
-    htmlstring +=  "<style>" + stl   + "</style></head><body>"  
-    htmlstring +=  content 
-    htmlstring +=  "</body></html>" 
-    return htmlstring 
+    htmlstring =   "<html><head><meta http-equiv='cache-control' content='no-cache'><meta name='GENERATOR' content='PyShoutOut'><title>Shout-Out Data</title><style type='text/css'>"
+    htmlstring +=  "<style>" + style  + "</style></head><body>"
+    htmlstring +=  content
+    htmlstring +=  "</body></html>"
+    return htmlstring
 
 #--------------
 #   Generates HTML Data based on given content  and write it to static html file
-#          Imports: 
+#          Imports:
 #               content    -   String  containing preformatted data
 #--------------
 def generate_html_into_file(content):
-    css = open("style.css", 'r')
-    stl =  css.read()
-    css.close()
-
     htmlstring = generate_html ( content )
 
     htmlfile = open( htmlfilename , 'w' )
@@ -54,19 +54,19 @@ def generate_html_into_file(content):
     htmlfile.close()
 
 #--------------
-# Generates HTML Data based on datafilename 's content 
+# Generates HTML Data based on datafilename 's content
 #--------------
 def generate_html_from_file():
-    old =  read_data_file() 
+    old =  read_data_file()
     generate_html_into_file( old   )
 
 #--------------
 # Generates and Displays generated HTML
 #--------------
-def generate_html_to_display_from_file():    
+def generate_html_to_display_from_file():
     old =  read_data_file()
     htmlstring = generate_html ( old )
-    print htmlstring 
+    print htmlstring
 
 #--------------
 #  Reads Data file from datafilename given name
@@ -81,7 +81,7 @@ def read_data_file():
 # Function for saving new Shoubox-Content & Regenerate static HTML file -- usually called by HTML-Form
 #--------------
 def process_form( name , indata , color ):
-    content = save_input(  name , indata , color ) 
+    content = save_input(  name , indata , color )
 
     if broadcast_destination == False:
           generate_html_into_file ( content )
@@ -110,19 +110,17 @@ def writeToNetwork ( content , broadcast_destination ):
 
 def writeToDisk ( content ):
         old = read_data_file()
-        finalcontent = content  + old 
+        finalcontent = content  + old
         datafile = open(datafilename, 'r+')
         datafile.write(finalcontent)
-        #datafile.truncate(0)
         datafile.close()
-	return finalcontent 
+	return finalcontent
 
 
 def prepare_line ( name, indata, color  ):
     datapass = re.sub("<", "&lt;", indata)
     data = re.sub(">", "&gt;", datapass)
-    curdate = datetime.datetime.now()
-    content = "<date>" + curdate.strftime("%H:%M:%S") + "</date>&nbsp;&nbsp;<name>" + name + ":</name>&nbsp;&nbsp;&nbsp;<data class='" + color + "'>" + data + "</data><br>\n" 
+    content = "<name>" + name + ":</name>&nbsp;&nbsp;&nbsp;<data class='" + color + "'>" + data + "</data><br>\n"
     return content
 
 #--------------
@@ -134,7 +132,7 @@ if __name__ == "__main__":
      save_input(  sys.argv[2] ,  sys.argv[3] ,  sys.argv[4] )
      generate_html_to_display_from_file()
      print "Entered Text."
-  
+
   generate_html_from_file ()
   print "Generated HTML-Shoutbox File."
 
