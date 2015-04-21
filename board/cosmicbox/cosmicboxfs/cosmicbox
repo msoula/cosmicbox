@@ -158,9 +158,13 @@ start() {
     echo "OK"
 
     # start droopy (http server for upload only) as daemon
-    echo -n "Starting droopy: "
-    start-stop-daemon -S -b -c $DROOPY_CHUID -m -p $DROOPY_PID --exec $DROOPY -- -d $DROOPY_DIR -m "$DROOPY_TXT" $DROOPY_PORT
-    echo "OK"
+    if [ $DROOPY_ENABLED = YES ]; then
+
+        echo -n "Starting droopy: "
+        start-stop-daemon -S -b -c $DROOPY_CHUID -m -p $DROOPY_PID --exec $DROOPY -- -d $DROOPY_DIR -m "$DROOPY_TXT" $DROOPY_PORT
+        echo "OK"
+
+    fi
 
     # start lighttpd as daemon
     echo -n "Starting lighttpd: "
