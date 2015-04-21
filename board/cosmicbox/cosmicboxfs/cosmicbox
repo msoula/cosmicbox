@@ -22,6 +22,7 @@ COSMICBOX_HOSTNAME=$(cat /etc/hostname)
 COSMICBOX_CONF=$COSMICBOX_HOME/cosmicbox.conf
 COSMICBOX_ETC_DIR=$COSMICBOX_HOME/etc
 COSMICBOX_TEMPLATES_DIR=$COSMICBOX_HOME/etc.templates
+COSMICBOX_WWW_DIR=$COSMICBOX_HOME/www
 
 # load config file
 [ -f $COSMICBOX_CONF ] || die "Cannot find config file"
@@ -36,7 +37,6 @@ DNSMASQ_PID=/var/run/dnsmasq.pid
 DROOPY=$COSMICBOX_HOME/bin/droopy
 DROOPY_CHUID=nobody:nogroup
 DROOPY_DIR=/media/usb0/Upload
-DROOPY_HOST=$COSMICBOX_HOST
 DROOPY_PID=/var/run/droopy.pid
 DROOPY_PORT=8080
 DROOPY_TXT=
@@ -67,7 +67,7 @@ prepare_config() {
                  $(grep '^[[:blank:]]*[^[:blank:]=]\+[[:blank:]]*=' $COSMICBOX_CONF | cut -d= -f1 | sed 's/[[:blank:]]//g')"
 
     # complete every config file with variable from cosmicbox config file
-    for f in $(find $COSMICBOX_ETC_DIR -type f); do
+    for f in $(find $COSMICBOX_ETC_DIR -type f) $COSMICBOX_WWW_DIR/config.json; do
 
         for v in $CONFIG_VARS; do
             value=$(eval echo \$$v)
@@ -78,7 +78,7 @@ prepare_config() {
     done
 
     # modify redirect file with new host
-    sed -i 's%http://\([^/]\+\)/content%http://'$COSMICBOX_HOST'/content%' $COSMICBOX_HOME/www/redirect.html
+    sed -i 's%http://\([^/]\+\)/content%http://'$COSMICBOX_HOST'/content%' $COSMICBOX_WWW_DIR/redirect.html
 }
 
 config() {
@@ -89,7 +89,7 @@ config() {
     $COSMICBOX_HOME/lib/psogen.py input "$COSMICBOX_CHAT_USER" "$COSMICBOX_CHAT_MSG" "def"
 
     # chown www directory
-    chown -R nobody:nogroup $COSMICBOX_HOME/www
+    chown -R nobody:nogroup $COSMICBOX_WWW_DIR
 
     # assure that lighttpd working dirs exist
     [ ! -d $LIGHTTPD_RUNDIR ] && mkdir $LIGHTTPD_RUNDIR
@@ -134,7 +134,7 @@ start() {
 
     # start droopy (http server for upload only) as daemon
     echo -n "Starting droopy: "
-    start-stop-daemon -S -b -c $DROOPY_CHUID -m -p $DROOPY_PID --exec $DROOPY -- -H $DROOPY_HOST -d $DROOPY_DIR -m "$DROOPY_TXT" $DROOPY_PORT
+    start-stop-daemon -S -b -c $DROOPY_CHUID -m -p $DROOPY_PID --exec $DROOPY -- -d $DROOPY_DIR -m "$DROOPY_TXT" $DROOPY_PORT
     echo "OK"
 
     # start lighttpd as daemon
