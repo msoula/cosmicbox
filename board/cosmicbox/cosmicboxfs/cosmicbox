@@ -67,7 +67,7 @@ prepare_config() {
                  $(grep '^[[:blank:]]*[^[:blank:]=]\+[[:blank:]]*=' $COSMICBOX_CONF | cut -d= -f1 | sed 's/[[:blank:]]//g')"
 
     # complete every config file with variable from cosmicbox config file
-    for f in $(find $COSMICBOX_ETC_DIR -type f) $COSMICBOX_WWW_DIR/config.json; do
+    for f in $(find $COSMICBOX_ETC_DIR -type f); do
 
         for v in $CONFIG_VARS; do
             value=$(eval echo \$$v)
@@ -81,12 +81,37 @@ prepare_config() {
     sed -i 's%http://\([^/]\+\)/content%http://'$COSMICBOX_HOST'/content%' $COSMICBOX_WWW_DIR/redirect.html
 }
 
+write_librarybox_config_file() {
+
+    if [ $DROOPY_ENABLED = YES ]; then
+
+cat << EOF > $COSMICBOX_WWW_DIR/config.json
+{ "librarybox" : { "module" : {
+    "upload" : { "status" : true, "droopy_host" : "$COSMICBOX_HOST", "droopy_port": $DROOPY_PORT  },
+    "shoutbox" : { "status" : true  }
+}  }  }
+EOF
+
+    else
+
+cat << EOF > $COSMICBOX_WWW_DIR/config.json
+{ "librarybox" : { "module" : {
+    "upload" : { "status" : false, "droopy_host" : "$COSMICBOX_HOST", "droopy_port": $DROOPY_PORT  },
+    "shoutbox" : { "status" : true  }
+}  }  }
+EOF
+
+   fi
+}
+
 config() {
 
     # initialize chat
     > $SHOUTBOX_CHATFILE
     export SHOUTBOX_CHATFILE SHOUTBOX_GEN_HTMLFILE
     $COSMICBOX_HOME/lib/psogen.py input "$COSMICBOX_CHAT_USER" "$COSMICBOX_CHAT_MSG" "def"
+
+    write_librarybox_config_file
 
     # chown www directory
     chown -R nobody:nogroup $COSMICBOX_WWW_DIR

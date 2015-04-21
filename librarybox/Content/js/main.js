@@ -48,6 +48,7 @@ $j(document).ready(function() {
             }
         }
         else {
+            document.getElementById("uploadnavbar").style.display="none";
             document.getElementById("uploadcontainer").style.display="none";
         }
     });
