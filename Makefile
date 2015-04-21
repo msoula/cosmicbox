@@ -2,11 +2,13 @@
 BUILDROOT_DIR := buildroot-2015.02
 TOP := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-all: configure build
+all: build
 
-# download buildroot and configure with cosmicbox config
+# configure buildroot the first time make is called
 configure:
+ifeq (,$(wildcard $(BUILDROOT_DIR)/.config))
 	cd $(BUILDROOT_DIR) && $(MAKE) BR2_EXTERNAL=$(TOP) cosmicbox_defconfig
+endif
 
 # start buildroot build process
 build: configure
