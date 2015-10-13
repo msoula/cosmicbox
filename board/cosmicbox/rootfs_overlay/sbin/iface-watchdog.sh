@@ -18,8 +18,11 @@ die() {
 
 while true; do
 
+    echo "Checking interface $1..."
     eval $TESTIFACE
     if [ 0 -eq $? ]; then
+
+        echo "Interface $1 is mounted..."
 
         # iface is connected
         /sbin/ifup $1
@@ -32,6 +35,8 @@ while true; do
         done
 
     else
+
+        echo "Interface $1 is unmounted..."
 
         # iface is not connected
         /sbin/ifdown $1

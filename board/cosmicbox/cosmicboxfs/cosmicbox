@@ -128,13 +128,6 @@ start() {
     prepare_config
     config
 
-    # wait for wlan0
-    eval $TESTIFACE
-    while [ 0 -ne $? ]; do
-        sleep 1
-        eval $TESTIFACE
-    done
-
     # wait for usb key
     while [ ! -h /sys/block/sda ]; do
         sleep 1
@@ -143,14 +136,18 @@ start() {
     fsck -a /dev/sda1
     mount /dev/sda1
 
+    # mount wlan0
+    echo -n "Mounting wireless net interface wlan0: "
+    if [ -n $COSMICBOX_WIFI_DEV_MODULE ]; then
+        modprobe $COSMICBOX_WIFI_DEV_MODULE
+    fi
+    /sbin/ifconfig wlan0 $COSMICBOX_ADDR netmask $COSMICBOX_MASK up
+    echo "OK"
 
     # start hostapd as daemon
     echo -n "Starting hostapd: "
     start-stop-daemon -S -b -q -m -p $HOSTAPD_PID --exec $HOSTAPD -- $HOSTAPD_CONF
     echo "OK"
-
-    # mount wlan0
-    /sbin/ifconfig wlan0 $COSMICBOX_ADDR netmask $COSMICBOX_MASK up
 
     # start dnsmasq as daemon
     echo -n "Starting dnsmasq: "
@@ -194,7 +191,12 @@ stop() {
     echo "OK"
 
     # umount wifi interface
+    echo "Unmounting wireless net interface wlan0: "
     /sbin/ifconfig wlan0 down
+    if [ -n $COSMICBOX_WIFI_DEV_MODULE ]; then
+        modprobe -r $COSMICBOX_WIFI_DEV_MODULE
+    fi
+    echo "OK"
 
     # stop hostapd
     echo -n "Stopping hostapd: "
