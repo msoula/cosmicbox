@@ -1,3 +1,6 @@
 [submodule "buildroot-2015.02"]
 	path = buildroot-2015.02
 	url = http://git.buildroot.net/git/buildroot.git
+[submodule "pulsar-content"]
+	path = pulsar-content
+	url = git@github.com:msoula/pulsar-content.git
