@@ -1,6 +1,5 @@
 BR2_arm=y
 BR2_arm1176jzf_s=y
-BR2_DEFCONFIG="/data/projects/cosmicbox/cosmicbox/configs/cosmicbox_defconfig"
 BR2_KERNEL_HEADERS_VERSION=y
 BR2_DEFAULT_KERNEL_VERSION="3.12.28"
 BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_3_12=y
