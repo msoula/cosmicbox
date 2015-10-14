@@ -133,7 +133,7 @@ start() {
         sleep 1
     done
 
-    fsck -a /dev/sda1
+    fsck -c 850 -a /dev/sda1
     mount /dev/sda1
 
     # mount wlan0
