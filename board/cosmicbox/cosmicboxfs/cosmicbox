@@ -18,6 +18,7 @@ die () {
 
 COSMICBOX_HOME=/cosmicbox
 COSMICBOX_HOSTNAME=$(cat /etc/hostname)
+COSMICBOX_PID=/var/run/cosmicbox.pid
 
 COSMICBOX_CONF=$COSMICBOX_HOME/cosmicbox.conf
 COSMICBOX_ETC_DIR=$COSMICBOX_HOME/etc
@@ -34,24 +35,12 @@ DNSMASQ=/usr/sbin/dnsmasq
 DNSMASQ_CONF=$COSMICBOX_ETC_DIR/dnsmasq.conf
 DNSMASQ_PID=/var/run/dnsmasq.pid
 
-DROOPY=$COSMICBOX_HOME/bin/droopy
-DROOPY_CHUID=nobody:nogroup
-DROOPY_DIR=/media/usb0/Upload
-DROOPY_PID=/var/run/droopy.pid
-DROOPY_PORT=8080
-DROOPY_TXT=
-
 HOSTAPD=/usr/sbin/hostapd
 HOSTAPD_CONF=$COSMICBOX_ETC_DIR/hostapd.conf
 HOSTAPD_PID=/var/run/hostapd.pid
 
-LIGHTTPD=/usr/sbin/lighttpd
-LIGHTTPD_CONF=$COSMICBOX_ETC_DIR/lighttpd/lighttpd.conf
-LIGHTTPD_PID=/var/run/lighttpd.pid
-LIGHTTPD_RUNDIR=/var/lib/lighttpd
-LIGHTTPD_SOCKETS=$LIGHTTPD_RUNDIR/sockets
-
 TESTIFACE="cat /proc/net/dev | grep wlan0 > /dev/null"
+TESTEDIMAX="lsusb -d 7392:7811 > /dev/null"
 
 prepare_config() {
 
@@ -77,63 +66,18 @@ prepare_config() {
 
     done
 
-    # modify redirect file with new host
-    sed -i 's%http://\([^/]\+\)/content%http://'$COSMICBOX_HOST'/content%' $COSMICBOX_WWW_DIR/redirect.html
-}
-
-write_librarybox_config_file() {
-
-    if [ $DROOPY_ENABLED = YES ]; then
-
-cat << EOF > $COSMICBOX_WWW_DIR/config.json
-{ "librarybox" : { "module" : {
-    "upload" : { "status" : true, "droopy_host" : "$COSMICBOX_HOST", "droopy_port": $DROOPY_PORT  },
-    "shoutbox" : { "status" : true  }
-}  }  }
-EOF
-
-    else
-
-cat << EOF > $COSMICBOX_WWW_DIR/config.json
-{ "librarybox" : { "module" : {
-    "upload" : { "status" : false, "droopy_host" : "$COSMICBOX_HOST", "droopy_port": $DROOPY_PORT  },
-    "shoutbox" : { "status" : true  }
-}  }  }
-EOF
-
-   fi
-}
-
-config() {
-
-    # initialize chat
-    > $SHOUTBOX_CHATFILE
-    export SHOUTBOX_CHATFILE SHOUTBOX_GEN_HTMLFILE
-    $COSMICBOX_HOME/lib/psogen.py input "$COSMICBOX_CHAT_USER" "$COSMICBOX_CHAT_MSG" "def"
-
-    write_librarybox_config_file
-
-    # chown www directory
-    chown -R nobody:nogroup $COSMICBOX_WWW_DIR
-
-    # assure that lighttpd working dirs exist
-    [ ! -d $LIGHTTPD_RUNDIR ] && mkdir $LIGHTTPD_RUNDIR
-    [ ! -d $LIGHTTPD_SOCKETS ] && mkdir $LIGHTTPD_SOCKETS
-    chown nobody:nogroup $LIGHTTPD_RUNDIR
-    chown nobody:nogroup $LIGHTTPD_SOCKETS
 }
 
 start() {
 
     prepare_config
-    config
 
     # wait for usb key
     while [ ! -h /sys/block/sda ]; do
         sleep 1
     done
 
-    fsck -a /dev/sda1
+    fsck -c 850 -a /dev/sda1
     mount /dev/sda1
 
     # mount wlan0
@@ -154,34 +98,18 @@ start() {
     start-stop-daemon -S -q --exec $DNSMASQ -- -C $DNSMASQ_CONF
     echo "OK"
 
-    # start droopy (http server for upload only) as daemon
-    if [ $DROOPY_ENABLED = YES ]; then
-
-        echo -n "Starting droopy: "
-        start-stop-daemon -S -b -c $DROOPY_CHUID -m -p $DROOPY_PID --exec $DROOPY -- -d $DROOPY_DIR -m "$DROOPY_TXT" $DROOPY_PORT
-        echo "OK"
-
-    fi
-
-    # start lighttpd as daemon
-    echo -n "Starting lighttpd: "
-    start-stop-daemon -S -q -p $LIGHTTPD_PID --exec $LIGHTTPD -- -f $LIGHTTPD_CONF
+    # start nodejs (use forever)
+    echo -n "Starting cosmicbox server..."
+    start-stop-daemon -S -b -q -m -p $COSMICBOX_PID --exec node -- ${COSMICBOX_WWW_DIR}/app.js /media/usb0
     echo "OK"
-
 }
 
 stop() {
 
-    # stop lighttpd
-    echo -n "Stopping lighttpd: "
-    start-stop-daemon -K -q -p $LIGHTTPD_PID
-    rm -f $LIGHTTPD_PID
-    echo "OK"
-
-    # stop droopy
-    echo -n "Stopping droopy: "
-    start-stop-daemon -K -q -p $DROOPY_PID
-    rm -f $DROOPY_PID
+    # stop nodejs (use forever)
+    echo -n "Stopping cosmicbox server..."
+    start-stop-daemon -K -q -p $COSMICBOX_PID
+    rm -f $COSMICBOX_PID
     echo "OK"
 
     # stop dnsmasq

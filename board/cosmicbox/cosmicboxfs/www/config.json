@@ -1,4 +1,0 @@
-{ "librarybox" : { "module" : {
-    "upload" : { "status" : false, "droopy_host" : "%COSMICBOX_HOST%", "droopy_port": 8080 },
-    "shoutbox" : { "status" : true }
-} } }

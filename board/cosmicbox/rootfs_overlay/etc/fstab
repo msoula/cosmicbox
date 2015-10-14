@@ -11,4 +11,4 @@ sysfs		/sys		sysfs	defaults				0	0
 /dev/mmcblk0p2	/cosmicbox	ext2	defaults			0	2
 
 # cosmicbox stick (nobody:nogroup)
-/dev/sda1		/media/usb0	vfat	defaults,noauto,gid=99,uid=99	0	2
+/dev/sda1		/media/usb0	vfat	defaults,noauto,gid=99,uid=99,iocharset=iso8859-1,codepage=850	0	2

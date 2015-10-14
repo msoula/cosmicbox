@@ -5,7 +5,10 @@ TOP := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 PATCH := patch
 BUILDROOT_HOSTAPD_PATCH := buildroot-hostapd-drv-rtw.patch
 
-all: build
+PULSAR_HOME := pulsar-content
+PULSAR_DEPLOY := board/cosmicbox/cosmicboxfs/www
+
+all: deploy-content build
 
 # configure buildroot the first time make is called
 configure:
@@ -19,12 +22,19 @@ endif
 build: configure
 	cd $(BUILDROOT_DIR) && $(MAKE)
 
+clean-content:
+	-rm -rf $(PULSAR_DEPLOY)/*
+
+deploy-content: clean-content
+	cp -rf -t $(PULSAR_DEPLOY) $(PULSAR_HOME)/app $(PULSAR_HOME)/app.js $(PULSAR_HOME)/public
+	ln -sf /usr/lib/node_modules $(PULSAR_DEPLOY)/node_modules
+
 menuconfig: configure
 	cd $(BUILDROOT_DIR) && $(MAKE) menuconfig
 
 linux-menuconfig: configure
 	cd $(BUILDROOT_DIR) && $(MAKE) linux-menuconfig
 
-clean:
+clean: configure clean-content
 	cd $(BUILDROOT_DIR) && $(MAKE) clean
 
