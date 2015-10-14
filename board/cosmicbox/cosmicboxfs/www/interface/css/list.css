@@ -1,0 +1,12 @@
+body{ background-color: #ECECEC;}
+#test-scandir ul {
+    list-style-type: none;
+    display: inline-block;
+    vertical-align: top;
+}
+#test-scandir ul li {
+    line-height: 25px;
+}
+#test-scandir ul li.folder {
+    list-style-image: url(img/folder.png);
+}
